@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenDesktop</name>
+    </assembly>
+    <members>
+        <member name="T:OpenDesktop.NameObjectCollection">
+            <summary>
+            This class is like NameValueCollection but instead of storing string values
+            it stores Object values. It is much more limited in functionality.
+            </summary>
+        </member>
+        <member name="M:OpenDesktop.NameObjectCollection.Add(System.Object,System.Object)">
+            <summary>
+            Add a key/value pair to the NameObjectCollection
+            </summary>
+            <param name="key">key</param>
+            <param name="value">value</param>
+        </member>
+        <member name="M:OpenDesktop.NameObjectCollection.Get(System.Object)">
+            <summary>
+            Gets the value(s) associated with the key
+            </summary>
+            <param name="key">query key</param>
+            <returns>ArrayList of values</returns>
+        </member>
+        <member name="P:OpenDesktop.ContentType.HTML">
+            <summary>
+            returns text/html
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.ContentType.CSS">
+            <summary>
+            returns text/css
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.ContentType.IMAGE_JPEG">
+            <summary>
+            returns image/jpg
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.ContentType.IMAGE_GIF">
+            <summary>
+            returns image/gif
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.ContentType.IMAGE_PNG">
+            <summary>
+            returns image/png
+            </summary>
+        </member>
+        <member name="T:OpenDesktop.WebServer">
+            <summary>
+            WebServer class. This class is responsible for:
+            1. Creating a server and listening for connections.
+            2. On connect, extract GET or POST string.
+            3. Open target page and parse it.
+            4. While parsing, call appropriate functions and create output page.
+            5. Display output page.
+            </summary>
+        </member>
+        <member name="M:OpenDesktop.WebServer.ProcessRequest(System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="socket"></param>
+        </member>
+        <member name="M:OpenDesktop.WebServer.CreateHeader(OpenDesktop.HttpResponseCode,System.String,System.Int32)">
+            <summary>
+            Creates a HTTP 1.1 header string to return to browsers
+            </summary>
+            <param name="status">Status Number ex. 200 for OK, 404 for file not found</param>
+            <param name="contentType">content type of the response body</param>
+            <param name="contentLength">length of response body</param>
+            <returns>header string</returns>
+        </member>
+        <member name="M:OpenDesktop.WebServer.ValidateRequest(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="request"></param>
+            <returns>Returns uri object on success else null</returns>
+        </member>
+        <member name="T:OpenDesktop.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.FileNotFound">
+            <summary>
+              Looks up a localized string similar to 404 - File Not Found.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.ServerString">
+            <summary>
+              Looks up a localized string similar to Open Desktop Search 0.1.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.TrayMenuExit">
+            <summary>
+              Looks up a localized string similar to &amp;Exit.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.TrayMenuOpen">
+            <summary>
+              Looks up a localized string similar to &amp;Open.
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.Properties.Resources.TrayMenuSettings">
+            <summary>
+              Looks up a localized string similar to &amp;Settings.
+            </summary>
+        </member>
+        <member name="T:OpenDesktop.Logger">
+            <summary>
+            File logger to log messages
+            </summary>
+        </member>
+        <member name="M:OpenDesktop.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:OpenDesktop.PluginManager">
+            <summary>
+            Responsible for Managing Plugins
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.PluginManager.RegisteredFileExtensions">
+            <summary>
+            Returns registered file extensions by all plugins
+            </summary>
+        </member>
+        <member name="P:OpenDesktop.PluginManager.RegisteredHTMLTags">
+            <summary>
+            Returns registered HTML tags by all plugins
+            </summary>
+        </member>
+        <member name="T:OpenDesktop.TrayIcon">
+            <summary>
+            Responsible for drawing the TrayIcon
+            </summary>
+        </member>
+        <member name="M:OpenDesktop.TrayIcon.SetStatus(System.String)">
+            <summary>
+            Sets the tooltip of the tray icon
+            </summary>
+            <param name="status"></param>
+        </member>
+        <member name="T:OpenDesktop.ReplaceTag">
+            <summary>
+            This class is responsible for replacing the 
+            </summary>
+        </member>
+        <member name="M:OpenDesktop.ReplaceTag.#ctor(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            
+            </summary>
+            <param name="query"></param>
+        </member>
+        <member name="M:OpenDesktop.ReplaceTag.Replace(System.Text.RegularExpressions.Match)">
+            <summary>
+            
+            </summary>
+            <param name="m"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

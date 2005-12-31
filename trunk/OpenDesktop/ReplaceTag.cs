@@ -43,10 +43,10 @@ namespace OpenDesktop
         }
 
         /// <summary>
-        /// 
+        /// Replaces Tags with appropriate string(s) got from the plugin
         /// </summary>
-        /// <param name="m"></param>
-        /// <returns></returns>
+        /// <param name="m">Match m</param>
+        /// <returns>String to replace the match with</returns>
         public string Replace(Match m)
         {
             string strTag = m.Groups[1].Value;
@@ -59,8 +59,8 @@ namespace OpenDesktop
                 for (int i = 0; i < sinfo.Length; i++)
                 {
                     string strDisplayText = GetRelevantText(sinfo[i].Text, strSearchTerm);
-                    sb.Append("<div><a href=\"" + sinfo[i].Launcher + "\">" + sinfo[i].Title +
-                        "</a><br />" + strDisplayText + "</div>");
+                    sb.Append("<li><a href=\"" + sinfo[i].Launcher + "\">" + sinfo[i].Title +
+                        "</a><br />" + strDisplayText + "</li>");
                 }
                 m_indexer.Close();
                 return sb.ToString();
@@ -76,10 +76,37 @@ namespace OpenDesktop
             return m.Value;
         }
 
+        /// <summary>
+        /// Gets a small paragraph of the text to display on the search results page
+        /// </summary>
+        /// <param name="text">The text gotten from the index</param>
+        /// <param name="searchTerm"></param>
+        /// <returns>small paragraph of text</returns>
         string GetRelevantText(string text, string searchTerm)
         {
+            const int textWindow = 100;
             string[] searchTerms = searchTerm.Split('+');
+            int iStart = 0;
+            int iEnd = text.Length;
+            foreach (string term in searchTerms)
+            {
+                int position = text.IndexOf(term);
+                if (position >= 0)
+                {
+                    if (position > textWindow)
+                    {
+                        iStart = position - textWindow;
+                    }
 
+                    if (position + textWindow < text.Length)
+                    {
+                        iEnd = position + textWindow;
+                    }
+
+                    break;
+                }
+            }
+            return text.Substring(iStart, iEnd - iStart);
         }
     }
 }

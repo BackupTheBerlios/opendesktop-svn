@@ -233,7 +233,22 @@ namespace YammyPlugin
         {
             string strData = Encoding.UTF8.GetString(data);
             strData = Regex.Replace(strData, @"\[[^m]+m", String.Empty);
+            MatchEvaluator matchEval = new MatchEvaluator(CleanDataMatchEval);
+            strData = Regex.Replace(strData, "<([^>]+)>", matchEval);
             return strData;
+        }
+
+        private string CleanDataMatchEval(Match m)
+        {
+            string strTag = m.Groups[1].Value;
+            if (strTag.Equals("ding"))
+            {
+                return @"<span class=""ding"">Buzz!</span>";
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
     }
 }

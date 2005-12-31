@@ -29,15 +29,33 @@ namespace OpenDesktop
         [STAThread]
         static void Main()
         {
+            if (AppIsRunning())
+            {
+                return;
+            }
             WebServer.Instance.Start();
             TrayIcon trayIcon = new TrayIcon();
             MessageBox.Show(WebServer.Instance.LocalAddress);
             FileExplorer fileExplorer = new FileExplorer(PluginManager.Instance.RegisteredFileExtensions);
             fileExplorer.Run();
+            
             Application.Run();
+
             fileExplorer.Stop();
             WebServer.Instance.Stop();
             Logger.Instance.Dispose();
+        }
+
+        /// <summary>
+        /// Creates a named mutex and tries to gain ownership. If successful,
+        /// it means it is the only app running. Else another app is running.
+        /// </summary>
+        /// <returns>True if another instance is running</returns>
+        static bool AppIsRunning()
+        {
+            bool bCreatedNew;
+            System.Threading.Mutex m = new System.Threading.Mutex(true, "OpenDesktopMutex", out bCreatedNew);            
+            return !bCreatedNew;
         }
     }
 }

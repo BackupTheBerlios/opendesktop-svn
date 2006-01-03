@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or
@@ -43,10 +43,11 @@ namespace OpenDesktop
             m_logQueue = new Queue(100, 10);
 
             //TODO: generate log file in WebRoot directory
-            m_objStreamWriter = new StreamWriter("OpenDesktopLog.html", false, Encoding.UTF8);
+            m_objStreamWriter = new StreamWriter("WebRoot\\OpenDesktopLog.html", false, Encoding.UTF8);
             m_objStreamWriter.WriteLine("<html><head><title>Open Desktop Log file</title>");
             m_objStreamWriter.WriteLine("<link rel=\"stylesheet\" href=\"style.css\" />");
             m_objStreamWriter.WriteLine("</head><body>");
+            m_objStreamWriter.WriteLine("<div class=\"container\"><div class=\"content\">");
 
             m_timer = new Timer(new TimerCallback(Flush), null, 0, 1000 * 60); // Once a minute, flush log
         }
@@ -57,7 +58,7 @@ namespace OpenDesktop
             m_timer.Dispose();
             if (m_objStreamWriter != null)
             {
-                m_objStreamWriter.WriteLine("</body></html>");
+                m_objStreamWriter.WriteLine("</div></div></body></html>");
                 m_objStreamWriter.Flush();
                 m_objStreamWriter.Close();
                 m_objStreamWriter = null;
@@ -102,7 +103,7 @@ namespace OpenDesktop
             lock (m_logQueue)
             {
                 DateTime dt = DateTime.Now;
-                string strTime = string.Format("{0}:{1}:{2}:{3}", dt.Hour, dt.Minute, dt.Second, dt.Millisecond);
+                string strTime = string.Format("{0:D2}:{1:D2}:{2:D2}:{3:D3}", dt.Hour, dt.Minute, dt.Second, dt.Millisecond);
                 m_logQueue.Enqueue(string.Format("<div{3}>{0} [{1}] {2}</div>", strTime, type, msg, (m_bAlternate ? " class=\"alt\"" : string.Empty)));
                 m_bAlternate = !m_bAlternate;
             }

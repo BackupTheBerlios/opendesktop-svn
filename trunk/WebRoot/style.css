@@ -20,6 +20,7 @@ body {
 }
 
 .container {
+	margin:0 auto;
 	background-color:#fff;
 	float:left;
 	text-align:left;

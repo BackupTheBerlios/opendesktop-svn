@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or

@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or
@@ -117,6 +117,9 @@ namespace OpenDesktop
             
             if (!_quit) // If the exit was natural
             {
+                Logger.Instance.LogDebug("Moving index from " +
+                    Properties.Settings.Default.IndexPath + " to " +
+                    Properties.Settings.Default.NewIndexPath);
                 // Close index and move it 
                 m_indexer.Close(); m_indexer = null;
                 Synchronizer.Instance.LockIndex();

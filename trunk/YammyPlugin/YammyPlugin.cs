@@ -73,6 +73,11 @@ namespace YammyPlugin
             }
         }
 
+        /// <summary>
+        /// Decodes the file and returns a SearchInfo object for indexing
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public SearchInfo ProcessFile(string filePath)
         {
             SearchInfo indexvars = null;
@@ -80,11 +85,10 @@ namespace YammyPlugin
             {
                 if (filePath.Contains("Profiles") && filePath.Contains("Messages"))
                 {
-                    Console.Out.WriteLine(filePath);
                     Decoder d = new Decoder(filePath);
                     string strText = d.Decode(true);
                     string strTitle = string.Format(Resources.IndexTitle, d.LocalID, d.RemoteID);
-                    indexvars = new SearchInfo(strTitle, strText, "display.html");
+                    indexvars = new SearchInfo(strTitle, strText, "display.html?convo=" + filePath);
                 }
             }
             

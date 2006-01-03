@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ODSPluginInterface")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Personal")]
+[assembly: AssemblyCompany("Pravin Paratey")]
 [assembly: AssemblyProduct("ODSPluginInterface")]
-[assembly: AssemblyCopyright("Copyright © Personal 2005")]
+[assembly: AssemblyCopyright("Copyright © Pravin Paratey 2005")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

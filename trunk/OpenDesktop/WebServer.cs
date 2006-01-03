@@ -223,7 +223,7 @@ namespace OpenDesktop
             if (uriRequest == null)
             {
                 Logger.Instance.LogDebug("Invalid Request" + strRequest);
-                SendErrorResponse(sock, HttpResponseCode.InvalidRequest, "Invalid request:\r\n" + strRequest);
+                SendErrorResponse(ref sock, HttpResponseCode.InvalidRequest, "Invalid request:\r\n" + strRequest);
                 return;
             }
 
@@ -242,7 +242,7 @@ namespace OpenDesktop
 
             if (!File.Exists(strFilePath))
             {
-                SendErrorResponse(sock, HttpResponseCode.FileNotFound, Resources.FileNotFound);
+                SendErrorResponse(ref sock, HttpResponseCode.FileNotFound, Resources.FileNotFound);
                 return;
             }
 
@@ -263,7 +263,7 @@ namespace OpenDesktop
                     reader.Close();
                     reader = null;
                 }
-                SendErrorResponse(sock, HttpResponseCode.Conflict, e.ToString());
+                SendErrorResponse(ref sock, HttpResponseCode.Conflict, e.ToString());
                 return;
             }
             string strContentType;
@@ -298,14 +298,11 @@ namespace OpenDesktop
             }
             else
             {
-                SendErrorResponse(sock, HttpResponseCode.Unsupported, "Unsupported mime type requested");
+                SendErrorResponse(ref sock, HttpResponseCode.Unsupported, "Unsupported mime type requested");
                 return;
             }
 
-            SendResponse(sock, responseData, strContentType, responseData.Length);
-            sock.Shutdown(SocketShutdown.Both);
-            Logger.Instance.LogDebug("Done Processing: " + uriRequest.ToString());
-            sock.Close();
+            SendResponse(ref sock, responseData, strContentType, responseData.Length);
         }
 
         /// <summary>
@@ -327,14 +324,27 @@ namespace OpenDesktop
             return strHeader;
         }
 
-        void SendResponse(Socket sock, byte[] content, string contentType, int contentLength)
+        void SendResponse(ref Socket sock, byte[] content, string contentType, int contentLength)
         {
             string strHeader = CreateHeader(HttpResponseCode.Ok, contentType, contentLength);
             sock.Send(Encoding.ASCII.GetBytes(strHeader));
             sock.Send(content, contentLength, SocketFlags.None);
+            // FIXME: The sleep has been added so that the data reaches the browser before
+            // we shutdown the socket. What is strange is Send is a sync call and so the
+            // control should sock.Shutdown only after the Send sends data to the browser
+            // But this is not what happens. Hence this Sleep hack.
+            Thread.Sleep(100);
+            sock.Shutdown(SocketShutdown.Both);
+            sock.Close(); sock = null;
         }
 
-        void SendErrorResponse(Socket sock, HttpResponseCode status, string errMessage)
+        /// <summary>
+        /// Sends an error response on the socket. Also closes the socket
+        /// </summary>
+        /// <param name="sock">socket to send response to</param>
+        /// <param name="status">Error Code</param>
+        /// <param name="errMessage">Message</param>
+        void SendErrorResponse(ref Socket sock, HttpResponseCode status, string errMessage)
         {
             StreamReader reader;
             string strErrorPage;
@@ -354,8 +364,11 @@ namespace OpenDesktop
 
             byte [] outbuf = Encoding.UTF8.GetBytes(strErrorPage);
             string strHeader = CreateHeader(status, "text/html;charset=utf-8", outbuf.Length);
+            // Header is always in ASCII encoding
             sock.Send(Encoding.ASCII.GetBytes(strHeader));
             sock.Send(outbuf, outbuf.Length, SocketFlags.None);
+            sock.Shutdown(SocketShutdown.Both);
+            sock.Close(); sock = null;
         }
 
         NameValueCollection MakeQueryString(string queryString)

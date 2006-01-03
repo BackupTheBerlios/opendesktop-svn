@@ -29,11 +29,15 @@ namespace OpenDesktop
         [STAThread]
         static void Main()
         {
+            Logger LOG = Logger.Instance;
+            LOG.LogDebug("Starting OpenDesktop");
             if (AppIsRunning())
             {
                 return;
             }
+            LOG.LogDebug("Bringing up Webserver");
             WebServer.Instance.Start();
+            LOG.LogDebug("Displaying NotifyIcon");
             TrayIcon trayIcon = new TrayIcon();
             MessageBox.Show(WebServer.Instance.LocalAddress);
             FileExplorer fileExplorer = new FileExplorer(PluginManager.Instance.RegisteredFileExtensions);
@@ -43,6 +47,7 @@ namespace OpenDesktop
 
             fileExplorer.Stop();
             WebServer.Instance.Stop();
+            LOG.LogDebug("Exiting OpenDesktop");
             Logger.Instance.Dispose();
         }
 

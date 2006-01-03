@@ -41,7 +41,7 @@ namespace OpenDesktop
             m_fileFunctionMap = fileFunctionMap;
             _quit = false;
             //TODO: m_htDNV = 
-            m_indexer = new Indexer(OpenDesktop.Properties.Settings.Default.IndexPath, IndexMode.CREATE);
+            m_indexer = new Indexer(Properties.Settings.Default.NewIndexPath, IndexMode.CREATE);
         }
 
         public void Dispose()
@@ -50,13 +50,24 @@ namespace OpenDesktop
             {
                 m_objThread.Abort();
             }
-            m_indexer.Close();
+            if (m_indexer != null)
+            {
+                m_indexer.Close();
+            }
         }
         #endregion
 
         #region Run/Stop/Pause/Resume
         public void Run()
         {
+            // Check if an update of the index is due
+            TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Default.IndexUpdateFrequency, 0, 0);
+            if (DateTime.Now.Subtract(Properties.Settings.Default.IndexLastUpdated) < objUpdateFrequency)
+            {
+                Logger.Instance.LogDebug("Update time not elapsed. Exiting FileExplorer");
+                return;
+            }
+
             m_objThread = new Thread(new ThreadStart(Explore));
             m_objThread.Priority = ThreadPriority.Lowest;
             m_objThread.Name = "FileExplorer";
@@ -66,13 +77,13 @@ namespace OpenDesktop
             }
             catch (Exception e)
             {
-                // TODO: log exception (can be out of stack exception)
+                Logger.Instance.LogException(e);
             }
         }
 
         public void Pause()
         {
-            if (m_objThread.ThreadState == ThreadState.Running)
+            if (m_objThread != null && m_objThread.ThreadState == ThreadState.Running)
             {
                 m_objThread.Suspend();
             }
@@ -80,7 +91,7 @@ namespace OpenDesktop
 
         public void Resume()
         {
-            if (m_objThread.ThreadState == ThreadState.Suspended)
+            if (m_objThread != null && m_objThread.ThreadState == ThreadState.Suspended)
             {
                 m_objThread.Resume();
             }
@@ -102,6 +113,20 @@ namespace OpenDesktop
                 {
                     Explore(strDrive);
                 }
+            }
+            
+            if (!_quit) // If the exit was natural
+            {
+                // Close index and move it 
+                m_indexer.Close(); m_indexer = null;
+                Synchronizer.Instance.LockIndex();
+                Directory.Delete(Properties.Settings.Default.IndexPath, true);
+                Directory.Move(Properties.Settings.Default.NewIndexPath, 
+                    Properties.Settings.Default.IndexPath);
+                Synchronizer.Instance.ReleaseIndex();
+
+                Properties.Settings.Default.IndexLastUpdated = DateTime.Now;
+                Properties.Settings.Default.Save();
             }
         }
 
@@ -161,7 +186,7 @@ namespace OpenDesktop
                 }
                 catch (Exception e) // Out of stack exception?
                 {
-                    // TODO: log exception
+                    Logger.Instance.LogException(e);
                 }
             }
         }

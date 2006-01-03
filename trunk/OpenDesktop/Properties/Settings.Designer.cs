@@ -34,5 +34,41 @@ namespace OpenDesktop.Properties {
                 this["IndexPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\test1")]
+        public string NewIndexPath {
+            get {
+                return ((string)(this["NewIndexPath"]));
+            }
+            set {
+                this["NewIndexPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2006-01-01")]
+        public global::System.DateTime IndexLastUpdated {
+            get {
+                return ((global::System.DateTime)(this["IndexLastUpdated"]));
+            }
+            set {
+                this["IndexLastUpdated"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("24")]
+        public int IndexUpdateFrequency {
+            get {
+                return ((int)(this["IndexUpdateFrequency"]));
+            }
+            set {
+                this["IndexUpdateFrequency"] = value;
+            }
+        }
     }
 }

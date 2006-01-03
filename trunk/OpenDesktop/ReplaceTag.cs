@@ -54,11 +54,18 @@ namespace OpenDesktop
             {
                 StringBuilder sb = new StringBuilder();
                 string strSearchTerm = m_queryString["search"];
+                
+                // If index is being moved by FileExplorer, wait till the move operation is complete
+                while (Synchronizer.Instance.IndexIsLocked)
+                {
+                    System.Threading.Thread.Sleep(500);
+                }
+                
                 Indexer m_indexer = new Indexer(OpenDesktop.Properties.Settings.Default.IndexPath, IndexMode.SEARCH);
                 SearchInfo [] sinfo = m_indexer.Search(strSearchTerm);
                 for (int i = 0; i < sinfo.Length; i++)
                 {
-                    string strDisplayText = GetRelevantText(sinfo[i].Text, strSearchTerm);
+                    string strDisplayText = GetExcerpt(sinfo[i].Text, strSearchTerm);
                     sb.Append("<li><a href=\"" + sinfo[i].Launcher + "\">" + sinfo[i].Title +
                         "</a><br />" + strDisplayText + "</li>");
                 }
@@ -82,7 +89,7 @@ namespace OpenDesktop
         /// <param name="text">The text gotten from the index</param>
         /// <param name="searchTerm"></param>
         /// <returns>small paragraph of text</returns>
-        string GetRelevantText(string text, string searchTerm)
+        string GetExcerpt(string text, string searchTerm)
         {
             const int textWindow = 100;
             string[] searchTerms = searchTerm.Split('+');

@@ -62,6 +62,7 @@ namespace OpenDesktop
                 catch (Exception e)
                 {
                     Logger.Instance.LogException(e);
+                    m_bSucess = false;
                 }
             }
             else if (mode == IndexMode.SEARCH)
@@ -74,6 +75,7 @@ namespace OpenDesktop
                 catch (Exception e)
                 {
                     Logger.Instance.LogException(e);
+                    m_bSucess = false;
                 }
             }
         }

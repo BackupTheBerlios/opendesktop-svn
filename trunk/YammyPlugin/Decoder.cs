@@ -224,7 +224,7 @@ namespace YammyPlugin
         {
             string date = MakeDTFromCTime(timeStamp).ToLongDateString();
 
-            sb.Append("<div class=\"convo\">");
+            sb.Append("<div class=\"convo-started\">");
             sb.AppendFormat(Resources.ConversationStarted, date);
             sb.Append("</div>");
         }
@@ -243,7 +243,7 @@ namespace YammyPlugin
             string strTag = m.Groups[1].Value;
             if (strTag.Equals("ding"))
             {
-                return @"<span class=""ding"">Buzz!</span>";
+                return @"<span class=""buzz"">Buzz!</span>";
             }
             else
             {

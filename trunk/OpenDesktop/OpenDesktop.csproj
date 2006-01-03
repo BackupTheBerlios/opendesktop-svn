@@ -71,6 +71,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="ReplaceTag.cs" />
+    <Compile Include="Synchronizer.cs" />
     <Compile Include="TrayIcon.cs" />
     <Compile Include="WebServer.cs" />
   </ItemGroup>
@@ -93,8 +94,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>mkdir "$(TargetDir)\WebRoot"
+copy "$(SolutionDir)\WebRoot\*.*" "$(TargetDir)\WebRoot"</PostBuildEvent>
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>

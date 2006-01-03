@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or
@@ -320,7 +320,7 @@ namespace OpenDesktop
                 "Server: " + Resources.ServerString + CRLF +
                 "Content-Type: " + contentType + CRLF +
                 "Accept-Ranges: bytes" + CRLF +
-                "Content-Length:" + contentLength + CRLF + CRLF;
+                "Content-Length: " + contentLength + CRLF + CRLF;
             return strHeader;
         }
 
@@ -397,7 +397,7 @@ namespace OpenDesktop
         /// <returns>Returns uri object on success else null</returns>
         Uri ValidateRequest(string request)
         {
-            string strUrl;
+            string strUrl = null;
             if (request.StartsWith("GET", StringComparison.OrdinalIgnoreCase))
             {
                 // Do Get
@@ -410,12 +410,21 @@ namespace OpenDesktop
             else if (request.StartsWith("POST", StringComparison.OrdinalIgnoreCase))
             {
                 // Do Post
-                return null;
+                // TODO: Content-Type field is ignored for now.
+                // Later, you'd want to use the content-type to determine if the data
+                // that follows is of type text, else flag an error
+                int iStart = request.IndexOf("\r\n\r\n") + 4;
+                if (iStart > 4)
+                {
+                    strUrl = request.Substring(iStart);
+                }
             }
-            else
+            
+            if(strUrl == null)
             {
                 return null;
             }
+            
             Uri uriRequest = null;
             try
             {

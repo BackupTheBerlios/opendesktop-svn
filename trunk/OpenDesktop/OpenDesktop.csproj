@@ -10,7 +10,7 @@
     <RootNamespace>OpenDesktop</RootNamespace>
     <AssemblyName>OpenDesktop</AssemblyName>
     <StartupObject>OpenDesktop.Program</StartupObject>
-    <ApplicationIcon>yammy.ICO</ApplicationIcon>
+    <ApplicationIcon>main.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config.cs" />
     <Compile Include="FileExplorer.cs" />
     <Compile Include="Indexer.cs" />
     <Compile Include="Logger.cs" />
@@ -77,13 +78,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="yammy.ICO" />
+    <None Include="main.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ODIPlugin\ODIPlugin.csproj">
       <Project>{99E38044-8BFC-4805-94F9-84C275E3120D}</Project>
       <Name>ODIPlugin</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ToDo.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -95,7 +99,10 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>mkdir "$(TargetDir)\WebRoot"
-copy "$(SolutionDir)\WebRoot\*.*" "$(TargetDir)\WebRoot"</PostBuildEvent>
+copy "$(SolutionDir)\WebRoot\*.*" "$(TargetDir)\WebRoot"
+mkdir "$(TargetDir)\Plugins"
+move "$(TargetDir)\YammyPlugin.dll" "$(TargetDir)\Plugins\"
+move "$(TargetDir)\YammyPlugin.pdb" "$(TargetDir)\Plugins\"</PostBuildEvent>
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>

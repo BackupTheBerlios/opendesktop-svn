@@ -70,11 +70,14 @@ namespace OpenDesktop
             }
         }
 
+        /// <summary>
+        /// Responsible for loading plugins and extracting RegisteredFileExtension and RegisteredHTMLTags
+        /// </summary>
         private void LoadPlugins()
         {
             m_objCollection = new NameObjectCollection();
             m_htTagMap = new Hashtable(10);
-            string strLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string strLocation = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "Plugins");
             string[] strFileList = Directory.GetFiles(strLocation, "*.dll");
 
             foreach (string file in strFileList)
@@ -82,13 +85,16 @@ namespace OpenDesktop
                 Assembly assembly;
                 try
                 {
+                    Logger.Instance.LogDebug("Loaded plugin: " + file);
                     assembly = Assembly.LoadFrom(file);
                 }
                 catch
                 {
+                    Logger.Instance.LogError("Unable to load plugin: " + file);
                     continue;
                 }
 
+                // TODO: Re-look this loop. Make it more efficient
                 foreach (Type t in assembly.GetTypes())
                 {
                     foreach (Type iface in t.GetInterfaces())
@@ -102,6 +108,7 @@ namespace OpenDesktop
                             }
                             catch
                             {
+                                Logger.Instance.LogError("Unable to load instance of plugin: " + file);
                                 continue;
                             }
                             foreach(string fileExtension in iPlugin.RegisteredFileExtentions)

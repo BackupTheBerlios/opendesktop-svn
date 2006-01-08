@@ -76,6 +76,13 @@ namespace OpenDesktop
         {
             get { return "image/png"; }
         }
+        /// <summary>
+        /// returns image/icon
+        /// </summary>
+        public static string IMAGE_ICO
+        {
+            get { return "image/icon"; }
+        }
     }
     #endregion
 
@@ -296,6 +303,10 @@ namespace OpenDesktop
             {
                 strContentType = ContentType.CSS;
             }
+            else if (strExtention.Equals(".ico", StringComparison.InvariantCultureIgnoreCase))
+            {
+                strContentType = ContentType.IMAGE_ICO;
+            }
             else
             {
                 SendErrorResponse(ref sock, HttpResponseCode.Unsupported, "Unsupported mime type requested");
@@ -327,8 +338,12 @@ namespace OpenDesktop
         void SendResponse(ref Socket sock, byte[] content, string contentType, int contentLength)
         {
             string strHeader = CreateHeader(HttpResponseCode.Ok, contentType, contentLength);
-            sock.Send(Encoding.ASCII.GetBytes(strHeader));
-            sock.Send(content, contentLength, SocketFlags.None);
+            try
+            {
+                sock.Send(Encoding.ASCII.GetBytes(strHeader));
+                sock.Send(content, contentLength, SocketFlags.None);
+            }
+            catch { }
             // FIXME: The sleep has been added so that the data reaches the browser before
             // we shutdown the socket. What is strange is Send is a sync call and so the
             // control should sock.Shutdown only after the Send sends data to the browser
@@ -365,8 +380,12 @@ namespace OpenDesktop
             byte [] outbuf = Encoding.UTF8.GetBytes(strErrorPage);
             string strHeader = CreateHeader(status, "text/html;charset=utf-8", outbuf.Length);
             // Header is always in ASCII encoding
-            sock.Send(Encoding.ASCII.GetBytes(strHeader));
-            sock.Send(outbuf, outbuf.Length, SocketFlags.None);
+            try
+            {
+                sock.Send(Encoding.ASCII.GetBytes(strHeader));
+                sock.Send(outbuf, outbuf.Length, SocketFlags.None);
+            }
+            catch { }
             sock.Shutdown(SocketShutdown.Both);
             sock.Close(); sock = null;
         }

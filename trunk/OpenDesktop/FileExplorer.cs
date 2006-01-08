@@ -25,6 +25,12 @@ using ODIPlugin;
 
 namespace OpenDesktop
 {
+    /// <summary>
+    /// Public delegate which tells how many documents have been indexed
+    /// </summary>
+    /// <param name="numDocs">number of documents already indexed</param>
+    public delegate void IndexProgressHandler(int numDocs);
+
     class FileExplorer : IDisposable
     {
         #region Private Vars
@@ -33,6 +39,19 @@ namespace OpenDesktop
         private bool _quit;
         private Hashtable m_htDNV; // Donot visit hashmap
         Indexer m_indexer;
+        private int m_iNumDocsDone;
+        private bool m_bAgressive; // true = dont sleep between documents
+        #endregion
+
+        #region Public Events
+        public event IndexProgressHandler IndexProgress;
+        private void OnIndexProgress(int numDocs)
+        {
+            if (IndexProgress != null)
+            {
+                IndexProgress(numDocs);
+            }
+        }
         #endregion
 
         #region Constructor
@@ -60,6 +79,8 @@ namespace OpenDesktop
         #region Run/Stop/Pause/Resume
         public void Run()
         {
+            m_iNumDocsDone = 0;
+
             // Check if an update of the index is due
             TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Default.IndexUpdateFrequency, 0, 0);
             if (DateTime.Now.Subtract(Properties.Settings.Default.IndexLastUpdated) < objUpdateFrequency)
@@ -103,6 +124,9 @@ namespace OpenDesktop
         }
         #endregion
 
+        /// <summary>
+        /// Explores
+        /// </summary>
         private void Explore()
         {
             string [] strDriveList = Environment.GetLogicalDrives();
@@ -122,11 +146,14 @@ namespace OpenDesktop
                     Properties.Settings.Default.NewIndexPath);
                 // Close index and move it 
                 m_indexer.Close(); m_indexer = null;
-                Synchronizer.Instance.LockIndex();
+
+                // Lock the index as we are going to be moving it
+                // FIXME: RACE CONDITION!!!! The code below is useless
+                Synchronizer.Instance.LockIndex(this);
                 Directory.Delete(Properties.Settings.Default.IndexPath, true);
                 Directory.Move(Properties.Settings.Default.NewIndexPath, 
                     Properties.Settings.Default.IndexPath);
-                Synchronizer.Instance.ReleaseIndex();
+                Synchronizer.Instance.ReleaseIndex(this);
 
                 Properties.Settings.Default.IndexLastUpdated = DateTime.Now;
                 Properties.Settings.Default.Save();
@@ -171,6 +198,7 @@ namespace OpenDesktop
                         if (sInfo != null)
                         {
                             m_indexer.AddDocument(sInfo);
+                            OnIndexProgress(++m_iNumDocsDone);
                         }
                     }
                     catch (Exception e)

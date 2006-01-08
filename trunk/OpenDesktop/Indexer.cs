@@ -111,7 +111,9 @@ namespace OpenDesktop
         {
             if (m_bSucess && m_indexMode != IndexMode.SEARCH && searchTerm != null)
                 return null;
-
+            
+            searchTerm = searchTerm.Replace("+", " + ");
+            
             Query query = QueryParser.Parse(searchTerm, "content", m_analyzer);
             Hits hits = m_indexSearcher.Search(query);
             int len = hits.Length();

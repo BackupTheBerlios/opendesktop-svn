@@ -16,14 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 
 namespace OpenDesktop
 {
     /// <summary>
     /// This will be a common class to synchronize events like
     /// 1. Obtaining a lock before moving a index-dir and releasing it after done.
+    /// Question: What happens if an object acquires a lock and dies before releasing it?
     /// </summary>
     class Synchronizer
     {
@@ -32,16 +32,23 @@ namespace OpenDesktop
         private static object m_lock = new object();
         private object m_indexerLock;
         private bool m_bIndexLocked = false;
+        private object m_objThatHoldsLock;
         #endregion
 
         #region Constructor
+        /// <summary>
+        /// Constructor
+        /// </summary>
         private Synchronizer()
         {
             m_indexerLock = new object();
         }
         #endregion
 
-        #region Standard Singletone Implementation
+        #region Standard Singleton Implementation
+        /// <summary>
+        /// Standard Singleton Implementation
+        /// </summary>
         public static Synchronizer Instance
         {
             get
@@ -65,31 +72,28 @@ namespace OpenDesktop
         /// <summary>
         /// Lock the index to tell everybody that index is going to change
         /// </summary>
-        public void LockIndex()
+        public void LockIndex(object obj)
         {
-            lock (m_indexerLock)
-            {
-                m_bIndexLocked = true;
-            }
+            Monitor.Enter(m_indexerLock);
+            Logger.Instance.LogDebug("Acquired Index lock");
+            // TODO: This function should be blocking. Should return only when the lock is acquired
+            m_bIndexLocked = true;
+            m_objThatHoldsLock = obj;
         }
 
         /// <summary>
         /// Release the lock
         /// </summary>
-        public void ReleaseIndex()
+        public void ReleaseIndex(object obj)
         {
-            lock (m_indexerLock)
+            if (m_objThatHoldsLock != obj)
             {
-                m_bIndexLocked = false;
+                return;
+                //throw new Exception("Different object trying to release lock");
             }
-        }
-
-        /// <summary>
-        /// Gets the lock state of the index
-        /// </summary>
-        public bool IndexIsLocked
-        {
-            get { return m_bIndexLocked; }
+            m_bIndexLocked = false;
+            Monitor.Exit(m_indexerLock);
+            Logger.Instance.LogDebug("Released Index lock");
         }
         #endregion
     }

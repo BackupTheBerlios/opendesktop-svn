@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or
@@ -31,8 +31,8 @@ namespace YammyPlugin
     public class YMArchiveDecoder : IPlugin
     {
         #region Private Variables
-        private string[] m_strRegisteredExtensions = {".dat"};
-        private string[] m_strRegisteredHTMLTags = { "YammyDecode", "YammyVersion" };
+        private string[] m_strRegisteredExtensions = { ".dat" };
+        private string[] m_strRegisteredHTMLTags = { "YammyDecode", "YammyVersion", "YammyDisplayTitle" };
         private string m_profilesPath;
         #endregion
 
@@ -108,6 +108,19 @@ namespace YammyPlugin
                         string strFilePath = Uri.UnescapeDataString(strPath);
                         Decoder d = new Decoder(strFilePath);
                         strText = d.Decode(false);
+                    }
+                }
+            }
+            else if (tag.Equals("YammyDisplayTitle", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (queryString != null)
+                {
+                    string strPath = queryString["convo"];
+                    if (strPath != null)
+                    {
+                        string strFilePath = Uri.UnescapeDataString(strPath);
+                        Decoder d = new Decoder(strFilePath);
+                        strText = string.Format(Properties.Resources.IndexTitle, d.LocalID, d.RemoteID);
                     }
                 }
             }

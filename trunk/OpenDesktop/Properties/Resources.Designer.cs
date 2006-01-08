@@ -77,6 +77,42 @@ namespace OpenDesktop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Search Results.
+        /// </summary>
+        internal static string NoSearchResults {
+            get {
+                return ResourceManager.GetString("NoSearchResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Results {0} - {1} of about {2} for {3}.
+        /// </summary>
+        internal static string SearchResultsHeader {
+            get {
+                return ResourceManager.GetString("SearchResultsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        internal static string SearchResultsNext {
+            get {
+                return ResourceManager.GetString("SearchResultsNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prev.
+        /// </summary>
+        internal static string SearchResultsPrev {
+            get {
+                return ResourceManager.GetString("SearchResultsPrev", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Open Desktop Search 0.1.
         /// </summary>
         internal static string ServerString {

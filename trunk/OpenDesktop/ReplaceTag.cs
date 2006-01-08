@@ -52,25 +52,7 @@ namespace OpenDesktop
             string strTag = m.Groups[1].Value;
             if (strTag.Equals("SearchResult", StringComparison.InvariantCultureIgnoreCase))
             {
-                StringBuilder sb = new StringBuilder();
-                string strSearchTerm = m_queryString["search"];
-                
-                // If index is being moved by FileExplorer, wait till the move operation is complete
-                while (Synchronizer.Instance.IndexIsLocked)
-                {
-                    System.Threading.Thread.Sleep(500);
-                }
-                
-                Indexer m_indexer = new Indexer(OpenDesktop.Properties.Settings.Default.IndexPath, IndexMode.SEARCH);
-                SearchInfo [] sinfo = m_indexer.Search(strSearchTerm);
-                for (int i = 0; i < sinfo.Length; i++)
-                {
-                    string strDisplayText = GetExcerpt(sinfo[i].Text, strSearchTerm);
-                    sb.Append("<li><a href=\"" + sinfo[i].Launcher + "\">" + sinfo[i].Title +
-                        "</a><br />" + strDisplayText + "</li>");
-                }
-                m_indexer.Close();
-                return sb.ToString();
+                return DoSearchResult();
             }
             else if (PluginManager.Instance.RegisteredHTMLTags.ContainsKey(strTag))
             {
@@ -95,9 +77,11 @@ namespace OpenDesktop
             string[] searchTerms = searchTerm.Split('+');
             int iStart = 0;
             int iEnd = text.Length;
+
+            // Get the position of the first term
             foreach (string term in searchTerms)
             {
-                int position = text.IndexOf(term);
+                int position = text.IndexOf(term, StringComparison.InvariantCultureIgnoreCase);
                 if (position >= 0)
                 {
                     if (position > textWindow)
@@ -110,10 +94,103 @@ namespace OpenDesktop
                         iEnd = position + textWindow;
                     }
 
-                    break;
+                    break; // if atleast one term is present
                 }
             }
-            return text.Substring(iStart, iEnd - iStart);
+            string strExcerpt = text.Substring(iStart, iEnd - iStart);
+            MatchEvaluator matchBoldify = new MatchEvaluator(Boldify);
+            // Make all search terms bold
+            foreach (string term in searchTerms)
+            {
+                strExcerpt = Regex.Replace(strExcerpt, term, matchBoldify, RegexOptions.IgnoreCase);
+            }
+
+            return strExcerpt;
+        }
+
+        /// <summary>
+        /// Highlights the search terms in the search results page by making them bold
+        /// </summary>
+        /// <param name="m">RegEx Match</param>
+        /// <returns>string with the search terms in bold</returns>
+        private string Boldify(Match m)
+        {
+            return "<b>" + m.Value + "</b>";
+        }
+
+        private string DoSearchResult()
+        {
+            string strSearchTerm = m_queryString["search"];
+            string strStartAt = m_queryString["page"];
+            int iStartAt = 0;
+            if (strStartAt != null)
+            {
+                try
+                {
+                    iStartAt = Int32.Parse(strStartAt) * 10;
+                }
+                catch
+                {
+                }
+            }
+
+            // Lock the index before starting search. This is to prevent FileExplorer from
+            // moving/deleting index while a search operation is in progress
+            Synchronizer.Instance.LockIndex(this);
+            Indexer m_indexer = new Indexer(OpenDesktop.Properties.Settings.Default.IndexPath, IndexMode.SEARCH);
+
+            string strReturnVal = string.Empty;
+
+            SearchInfo[] sinfo = m_indexer.Search(strSearchTerm);
+            if (sinfo.Length > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                int iEndAt = iStartAt + 10;
+                if (iEndAt > sinfo.Length)
+                {
+                    iEndAt = sinfo.Length;
+                }
+
+                // Display: Results 0 - 10 of about 44 for killing+work
+                sb.Append("<div class=\"search-nav\">" +
+                    string.Format(Properties.Resources.SearchResultsHeader,
+                    (iStartAt + 1).ToString(), iEndAt.ToString(),
+                    sinfo.Length.ToString(), strSearchTerm) + "</div>");
+                sb.Append("<ol class=\"search-results\">");
+
+                for (int i = iStartAt; i < iEndAt; i++)
+                {
+                    string strDisplayText = GetExcerpt(sinfo[i].Text, strSearchTerm);
+                    sb.Append("<li value=\"" + (i+1).ToString() + "\"><a href=\"" + sinfo[i].Launcher + 
+                        "\">" + sinfo[i].Title + "</a><br />" + strDisplayText + "</li>");
+                }
+                sb.Append("</ol>");
+                int iCurPageNum = (iStartAt/10);
+                string strPrevUrl = string.Empty;
+                string strNextUrl = string.Empty;
+                if (iCurPageNum > 0)
+                {
+                    strPrevUrl = string.Format("<a href=\"search.html?search={0}&page={1}\">",
+                        m_queryString["search"], (iCurPageNum - 1).ToString()) +
+                        Properties.Resources.SearchResultsPrev + "</a>";
+                }
+                if (iEndAt != sinfo.Length)
+                {
+                    strNextUrl = string.Format("<a href=\"search.html?search={0}&page={1}\">",
+                        m_queryString["search"], (iCurPageNum + 1).ToString()) +
+                        Properties.Resources.SearchResultsNext + "</a>";
+                }
+                sb.Append("<div class=\"search-nav\">" + strPrevUrl + " | " + strNextUrl + "</div>");
+                strReturnVal = sb.ToString();
+            }
+            else
+            {
+                strReturnVal = "<div class=\"no-search-results\">" + Properties.Resources.NoSearchResults + "</div>";
+            }
+            m_indexer.Close();
+            Synchronizer.Instance.ReleaseIndex(this);
+
+            return strReturnVal;
         }
     }
 }

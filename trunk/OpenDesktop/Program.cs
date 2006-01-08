@@ -1,5 +1,5 @@
 // OpenDesktop - A search tool for the Windows desktop
-// Copyright (C) 2005, Pravin Paratey (pravinp at gmail dot com)
+// Copyright (C) 2005-2006, Pravin Paratey (pravinp at gmail dot com)
 // http://opendesktop.berlios.de
 //
 // This program is free software; you can redistribute it and/or
@@ -41,6 +41,7 @@ namespace OpenDesktop
             TrayIcon trayIcon = new TrayIcon();
             MessageBox.Show(WebServer.Instance.LocalAddress);
             FileExplorer fileExplorer = new FileExplorer(PluginManager.Instance.RegisteredFileExtensions);
+            //fileExplorer.IndexProgress += new IndexProgressHandler(fileExplorer_IndexProgress);
             fileExplorer.Run();
             
             Application.Run();
@@ -49,6 +50,12 @@ namespace OpenDesktop
             WebServer.Instance.Stop();
             LOG.LogDebug("Exiting OpenDesktop");
             Logger.Instance.Dispose();
+        }
+
+        // Changes the TrayIcon message to reflect number of documents indexed
+        static void fileExplorer_IndexProgress(int numDocs)
+        {
+            
         }
 
         /// <summary>

@@ -1,9 +1,8 @@
-/* OpenDesktop YammyPlugin Stylesheet 
+﻿/* OpenDesktop YammyPlugin Stylesheet 
  * (c) Pravin Paratey 2005
  * Released under GPL
 */
 body {
-	background-image:url('bg.gif');
 	font-family:Trebuchet MS,sans-serif;
 	text-align:center;
 	padding-left:10px;
@@ -19,12 +18,18 @@ body {
 	border-bottom:dotted 1px #999;
 }
 
+.header a {
+	text-decoration:none;
+}
+
+.header a:hover {
+	text-decoration:underline;
+}
+
 .container {
 	margin:0 auto;
 	background-color:#fff;
-	float:left;
 	text-align:left;
-	width:750px;
 }
 
 .footer {
@@ -37,8 +42,38 @@ body {
 	background-color:#fff;
 }
 
+.content h1 {
+	font-size:16pt;
+	font-family:Georgia, Serif;
+	font-weight:normal;
+	color:#339;
+}
+
+.content td {
+	font-size:10pt;
+}
+
 .search {
 	font-size:10pt;
+}
+
+.search-nav {
+	border:0px;
+	background:#def;
+	border-top:2px solid #9cf;
+	padding:2px;
+	text-align:right;
+}
+
+.search-results {
+	width:550px;
+}
+.search-results li {
+	padding:5px;
+}
+
+.no-search-results {
+	font-style:italic;
 }
 
 .convo-started {

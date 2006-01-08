@@ -47,7 +47,9 @@ namespace OpenDesktop
             m_objStreamWriter.WriteLine("<html><head><title>Open Desktop Log file</title>");
             m_objStreamWriter.WriteLine("<link rel=\"stylesheet\" href=\"style.css\" />");
             m_objStreamWriter.WriteLine("</head><body>");
+            m_objStreamWriter.WriteLine("<div class=\"header\"><a href=\"http://opendesktop.berlios.de\">Website</a></div>");
             m_objStreamWriter.WriteLine("<div class=\"container\"><div class=\"content\">");
+            m_objStreamWriter.WriteLine("<h1>OpenDesktop log file [" + DateTime.Now.ToLongDateString() + "]</h1>");
 
             m_timer = new Timer(new TimerCallback(Flush), null, 0, 1000 * 60); // Once a minute, flush log
         }
@@ -58,6 +60,7 @@ namespace OpenDesktop
             m_timer.Dispose();
             if (m_objStreamWriter != null)
             {
+                m_objStreamWriter.WriteLine("<div class=\"footer\">OpenDesktop Search &copy; 2005-2006, Pravin Paratey</div>");
                 m_objStreamWriter.WriteLine("</div></div></body></html>");
                 m_objStreamWriter.Flush();
                 m_objStreamWriter.Close();

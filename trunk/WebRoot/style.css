@@ -105,3 +105,34 @@ body {
 	color:#800;
 	font-weight:bold;
 }
+
+.setup {
+	margin:20px auto;
+	font-size:12pt;
+	font-family:Bookman Old Style, serif;
+	width:400px;
+	line-height:150%;
+	text-align:left;
+	background:#fee;
+	padding:10px;
+	border:1px solid #fdd;
+}
+
+.setup input {
+	border-style:none;
+	background:#ffe;
+	padding:4px;
+	text-decoration:none;
+	color:#000;
+}
+
+.setup-button a {
+	border:1px solid #ddf;
+	background:#eef;
+	padding:4px;
+	text-decoration:none;
+	color:#000;
+}
+.setup-button a:hover {
+	background:#fff;
+}

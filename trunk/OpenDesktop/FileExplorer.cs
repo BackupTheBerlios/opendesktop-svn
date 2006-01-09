@@ -25,201 +25,209 @@ using ODIPlugin;
 
 namespace OpenDesktop
 {
-    /// <summary>
-    /// Public delegate which tells how many documents have been indexed
-    /// </summary>
-    /// <param name="numDocs">number of documents already indexed</param>
-    public delegate void IndexProgressHandler(int numDocs);
+	/// <summary>
+	/// Public delegate which tells how many documents have been indexed
+	/// </summary>
+	/// <param name="numDocs">number of documents already indexed</param>
+	public delegate void IndexProgressHandler(int numDocs);
 
-    class FileExplorer : IDisposable
-    {
-        #region Private Vars
-        private NameObjectCollection m_fileFunctionMap;
-        private Thread m_objThread;
-        private bool _quit;
-        private Hashtable m_htDNV; // Donot visit hashmap
-        Indexer m_indexer;
-        private int m_iNumDocsDone;
-        private bool m_bAgressive; // true = dont sleep between documents
-        #endregion
+	class FileExplorer : IDisposable
+	{
+		#region Private Vars
+		private NameObjectCollection m_fileFunctionMap;
+		private Thread m_objThread;
+		private bool _quit;
+		private Hashtable m_htDNV; // Donot visit hashmap
+		Indexer m_indexer;
+		private int m_iNumDocsDone;
+		private bool m_bAgressive; // true = dont sleep between documents
+		#endregion
 
-        #region Public Events
-        public event IndexProgressHandler IndexProgress;
-        private void OnIndexProgress(int numDocs)
-        {
-            if (IndexProgress != null)
-            {
-                IndexProgress(numDocs);
-            }
-        }
-        #endregion
+		#region Public Events
+		public event IndexProgressHandler IndexProgress;
+		private void OnIndexProgress(int numDocs)
+		{
+			if (IndexProgress != null)
+			{
+				IndexProgress(numDocs);
+			}
+		}
+		#endregion
 
-        #region Constructor
-        public FileExplorer(NameObjectCollection fileFunctionMap)
-        {
-            m_fileFunctionMap = fileFunctionMap;
-            _quit = false;
-            //TODO: m_htDNV = 
-            m_indexer = new Indexer(Properties.Settings.Default.NewIndexPath, IndexMode.CREATE);
-        }
+		#region Constructor
+		public FileExplorer(NameObjectCollection fileFunctionMap)
+		{
+			m_fileFunctionMap = fileFunctionMap;
+			_quit = false;
+			//TODO: m_htDNV = 
+			m_indexer = new Indexer(Properties.Settings.Default.NewIndexPath, IndexMode.CREATE);
+		}
 
-        public void Dispose()
-        {
-            if (m_objThread != null)
-            {
-                m_objThread.Abort();
-            }
-            if (m_indexer != null)
-            {
-                m_indexer.Close();
-            }
-        }
-        #endregion
+		public void Dispose()
+		{
+			if (m_objThread != null)
+			{
+				m_objThread.Abort();
+			}
+			if (m_indexer != null)
+			{
+				m_indexer.Close();
+			}
+		}
+		#endregion
 
-        #region Run/Stop/Pause/Resume
-        public void Run()
-        {
-            m_iNumDocsDone = 0;
+		#region Run/Stop/Pause/Resume
+		public void Run()
+		{
+			m_iNumDocsDone = 0;
 
-            // Check if an update of the index is due
-            TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Default.IndexUpdateFrequency, 0, 0);
-            if (DateTime.Now.Subtract(Properties.Settings.Default.IndexLastUpdated) < objUpdateFrequency)
-            {
-                Logger.Instance.LogDebug("Update time not elapsed. Exiting FileExplorer");
-                return;
-            }
+			// Check if an update of the index is due
+			TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Default.IndexUpdateFrequency, 0, 0);
+			if (DateTime.Now.Subtract(Properties.Settings.Default.IndexLastUpdated) < objUpdateFrequency)
+			{
+				Logger.Instance.LogDebug("Update time not elapsed. Exiting FileExplorer");
+				return;
+			}
 
-            m_objThread = new Thread(new ThreadStart(Explore));
-            m_objThread.Priority = ThreadPriority.Lowest;
-            m_objThread.Name = "FileExplorer";
-            try
-            {
-                m_objThread.Start();
-            }
-            catch (Exception e)
-            {
-                Logger.Instance.LogException(e);
-            }
-        }
+			m_objThread = new Thread(new ThreadStart(Explore));
+			m_objThread.Priority = ThreadPriority.Lowest;
+			m_objThread.Name = "FileExplorer";
+			try
+			{
+				m_objThread.Start();
+			}
+			catch (Exception e)
+			{
+				Logger.Instance.LogException(e);
+			}
+		}
 
-        public void Pause()
-        {
-            if (m_objThread != null && m_objThread.ThreadState == ThreadState.Running)
-            {
-                m_objThread.Suspend();
-            }
-        }
+		public void Pause()
+		{
+			if (m_objThread != null && m_objThread.ThreadState == ThreadState.Running)
+			{
+				m_objThread.Suspend();
+			}
+		}
 
-        public void Resume()
-        {
-            if (m_objThread != null && m_objThread.ThreadState == ThreadState.Suspended)
-            {
-                m_objThread.Resume();
-            }
-        }
+		public void Resume()
+		{
+			if (m_objThread != null && m_objThread.ThreadState == ThreadState.Suspended)
+			{
+				m_objThread.Resume();
+			}
+		}
 
-        public void Stop()
-        {
-            _quit = true;
-        }
-        #endregion
+		public void Stop()
+		{
+			_quit = true;
+		}
+		#endregion
 
-        /// <summary>
-        /// Explores
-        /// </summary>
-        private void Explore()
-        {
-            string [] strDriveList = Environment.GetLogicalDrives();
-            foreach (string strDrive in strDriveList)
-            {
-                DriveInfo info = new DriveInfo(strDrive);
-                if (info.IsReady)
-                {
-                    Explore(strDrive);
-                }
-            }
-            
-            if (!_quit) // If the exit was natural
-            {
-                Logger.Instance.LogDebug("Moving index from " +
-                    Properties.Settings.Default.IndexPath + " to " +
-                    Properties.Settings.Default.NewIndexPath);
-                // Close index and move it 
-                m_indexer.Close(); m_indexer = null;
+		/// <summary>
+		/// Explores
+		/// </summary>
+		private void Explore()
+		{
+			string [] strDriveList = Environment.GetLogicalDrives();
+			foreach (string strDrive in strDriveList)
+			{
+				DriveInfo info = new DriveInfo(strDrive);
+				if (info.IsReady)
+				{
+					Logger.Instance.LogDebug("Exploring " + strDrive);
+					Explore(strDrive);
+				}
+			}
 
-                // Lock the index as we are going to be moving it
-                // FIXME: RACE CONDITION!!!! The code below is useless
-                Synchronizer.Instance.LockIndex(this);
-                Directory.Delete(Properties.Settings.Default.IndexPath, true);
-                Directory.Move(Properties.Settings.Default.NewIndexPath, 
-                    Properties.Settings.Default.IndexPath);
-                Synchronizer.Instance.ReleaseIndex(this);
+			if (!_quit) // If the exit was natural
+			{
+				Logger.Instance.LogDebug("Moving index from " +
+					Properties.Settings.Default.IndexPath + " to " +
+					Properties.Settings.Default.NewIndexPath);
+				// Close index and move it 
+				m_indexer.Close(); m_indexer = null;
 
-                Properties.Settings.Default.IndexLastUpdated = DateTime.Now;
-                Properties.Settings.Default.Save();
-            }
-        }
+				// Lock the index as we are going to be moving it
+				// FIXME: RACE CONDITION!!!! The code below is useless
+				Synchronizer.Instance.LockIndex(this);
+				try
+				{
+					Directory.Delete(Properties.Settings.Default.IndexPath, true);
+					Directory.Move(Properties.Settings.Default.NewIndexPath,
+						Properties.Settings.Default.IndexPath);
+					Synchronizer.Instance.ReleaseIndex(this);
 
-        private void Explore(string directory)
-        {
-            if (_quit)
-                return;
+					Properties.Settings.Default.IndexLastUpdated = DateTime.Now;
+					Properties.Settings.Default.Save();
+				}
+				catch (Exception e)
+				{
+					Logger.Instance.LogException(e);
+				}
+			}
+		}
 
-            string[] strDirList;
-            string[] strFileList;
-            
-            try
-            {
-                strDirList = Directory.GetDirectories(directory);
-                strFileList = Directory.GetFiles(directory);
-            }
-            catch
-            {
-                return;
-            }
+		private void Explore(string directory)
+		{
+			if (_quit)
+				return;
 
-            foreach (string strFile in strFileList)
-            {
-                if (_quit)
-                    return;
+			string[] strDirList;
+			string[] strFileList;
 
-                string strExtention = Path.GetExtension(strFile).ToLower();
-                if (strExtention.Length == 0)
-                    continue;
-                ArrayList arPluginList = m_fileFunctionMap.Get(strExtention);
-                if (arPluginList == null)
-                    continue;
+			try
+			{
+				strDirList = Directory.GetDirectories(directory);
+				strFileList = Directory.GetFiles(directory);
+			}
+			catch
+			{
+				return;
+			}
 
-                foreach (IPlugin plugin in arPluginList)
-                {
-                    try
-                    {
-                        SearchInfo sInfo = plugin.ProcessFile(strFile);
-                        if (sInfo != null)
-                        {
-                            m_indexer.AddDocument(sInfo);
-                            OnIndexProgress(++m_iNumDocsDone);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Instance.LogException(e);
-                    }
-                }
-            }
-            foreach (string strDir in strDirList)
-            {
-                if (_quit)
-                    return;
-                try
-                {
-                    Explore(strDir);
-                }
-                catch (Exception e) // Out of stack exception?
-                {
-                    Logger.Instance.LogException(e);
-                }
-            }
-        }
-    }
+			foreach (string strFile in strFileList)
+			{
+				if (_quit)
+					return;
+
+				string strExtention = Path.GetExtension(strFile).ToLower();
+				if (strExtention.Length == 0)
+					continue;
+				ArrayList arPluginList = m_fileFunctionMap.Get(strExtention);
+				if (arPluginList == null)
+					continue;
+
+				foreach (IPlugin plugin in arPluginList)
+				{
+					try
+					{
+						SearchInfo sInfo = plugin.ProcessFile(strFile);
+						if (sInfo != null)
+						{
+							m_indexer.AddDocument(sInfo);
+							OnIndexProgress(++m_iNumDocsDone);
+						}
+					}
+					catch (Exception e)
+					{
+						Logger.Instance.LogException(e);
+					}
+				}
+			}
+			foreach (string strDir in strDirList)
+			{
+				if (_quit)
+					return;
+				try
+				{
+					Explore(strDir);
+				}
+				catch (Exception e) // Out of stack exception?
+				{
+					Logger.Instance.LogException(e);
+				}
+			}
+		}
+	}
 }

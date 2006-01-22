@@ -20,7 +20,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 
-using ODIPlugin;
+using OpenDesktop.Plugin;
 
 namespace OpenDesktop
 {

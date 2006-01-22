@@ -19,7 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 
-namespace ODIPlugin
+namespace OpenDesktop.Plugin
 {
     #region class SearchInfo
     /// <summary>

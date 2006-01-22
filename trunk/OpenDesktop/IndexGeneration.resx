@@ -117,11 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FileNotFound" xml:space="preserve">
-    <value>404 - File Not Found</value>
-  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="MainIcon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAkAMDAQAAEABABoBgAAlgAAACAgEAABAAQA6AIAAP4GAAAQEBAAAQAEACgBAADmCQAAMDAAAAEA
         CACoDgAADgsAACAgAAABAAgAqAgAALYZAAAQEAAAAQAIAGgFAABeIgAAMDAAAAEAIACoJQAAxicAACAg
@@ -545,30 +542,5 @@
         AAAAAAAAAAAAAPAPAADAASS6gAA3/4AAOv8AAD3/AAA//wAAQf8AAEP/AABF/wAASf8AAEz/AABE/wAA
         JP+AACz/4AAr//wHLv8=
 </value>
-  </data>
-  <data name="NoSearchResults" xml:space="preserve">
-    <value>No Search Results</value>
-  </data>
-  <data name="SearchResultsHeader" xml:space="preserve">
-    <value>Results {0} - {1} of about {2} for {3}</value>
-    <comment>ex. Results 1 - 10 of about 100 for OpenDesktop</comment>
-  </data>
-  <data name="SearchResultsNext" xml:space="preserve">
-    <value>Next</value>
-  </data>
-  <data name="SearchResultsPrev" xml:space="preserve">
-    <value>Prev</value>
-  </data>
-  <data name="ServerString" xml:space="preserve">
-    <value>Open Desktop Search 0.1</value>
-  </data>
-  <data name="TrayMenuExit" xml:space="preserve">
-    <value>&amp;Exit</value>
-  </data>
-  <data name="TrayMenuOpen" xml:space="preserve">
-    <value>&amp;Open</value>
-  </data>
-  <data name="TrayMenuSettings" xml:space="preserve">
-    <value>&amp;Settings</value>
   </data>
 </root>

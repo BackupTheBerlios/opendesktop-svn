@@ -106,7 +106,7 @@ body {
 	font-weight:bold;
 }
 
-.setup {
+.settings {
 	margin:20px auto;
 	font-size:12pt;
 	font-family:Bookman Old Style, serif;
@@ -118,12 +118,20 @@ body {
 	border:1px solid #fdd;
 }
 
-.setup input {
-	border-style:none;
+.box-main_search {
+	margin:20px auto;
+	font-size:12pt;
+	font-family:Bookman Old Style, serif;
+	width:400px;
+	line-height:150%;
+	text-align:left;
+	background:#efe;
+	padding:10px;
+	border:1px solid #fdd;
+}
+
+.yellow-background {
 	background:#ffe;
-	padding:4px;
-	text-decoration:none;
-	color:#000;
 }
 
 .setup-button a {

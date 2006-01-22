@@ -16,11 +16,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 using System;
-using System.Collections.Specialized;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Specialized;
 
-using ODIPlugin;
+using OpenDesktop.Plugin;
+using OpenDesktop.Properties;
 
 namespace OpenDesktop
 {
@@ -54,9 +55,13 @@ namespace OpenDesktop
             {
                 return DoSearchResult();
             }
+            else if (strTag.Equals("OpenDesktopSettings", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Settings.Instance.ProcessTag(m_queryString);
+            }
             else if (PluginManager.Instance.RegisteredHTMLTags.ContainsKey(strTag))
             {
-                ODIPlugin.IPlugin plugin = PluginManager.Instance.RegisteredHTMLTags[strTag] as ODIPlugin.IPlugin;
+                IPlugin plugin = PluginManager.Instance.RegisteredHTMLTags[strTag] as IPlugin;
                 if (plugin != null)
                 {
                     return plugin.ProcessTag(strTag, m_queryString);
@@ -137,12 +142,12 @@ namespace OpenDesktop
             // Lock the index before starting search. This is to prevent FileExplorer from
             // moving/deleting index while a search operation is in progress
             Synchronizer.Instance.LockIndex(this);
-            Indexer m_indexer = new Indexer(OpenDesktop.Properties.Settings.Default.IndexPath, IndexMode.SEARCH);
+            Indexer m_indexer = new Indexer(OpenDesktop.Properties.Settings.Instance.IndexPath, IndexMode.SEARCH);
 
             string strReturnVal = string.Empty;
 
             SearchInfo[] sinfo = m_indexer.Search(strSearchTerm);
-            if (sinfo.Length > 0)
+            if (sinfo != null && sinfo.Length > 0)
             {
                 StringBuilder sb = new StringBuilder();
                 int iEndAt = iStartAt + 10;

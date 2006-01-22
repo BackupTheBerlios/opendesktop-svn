@@ -2,108 +2,72 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C9701934-2BA6-4BFD-9665-B5640B00387A}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <ProjectGuid>{61CB7178-B1C3-4C40-88FC-29A417A7A705}</ProjectGuid>
     <RootNamespace>OpenDesktop</RootNamespace>
     <AssemblyName>OpenDesktop</AssemblyName>
-    <StartupObject>OpenDesktop.Program</StartupObject>
+    <OutputType>WinExe</OutputType>
+    <WarningLevel>4</WarningLevel>
+    <NoStdLib>False</NoStdLib>
+    <NoConfig>False</NoConfig>
+    <RunPostBuildEvent>OnSuccessfulBuild</RunPostBuildEvent>
     <ApplicationIcon>main.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>OpenDesktop.xml</DocumentationFile>
+    <DebugSymbols>True</DebugSymbols>
+    <Optimize>False</Optimize>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>OpenDesktop.xml</DocumentationFile>
+    <DebugSymbols>False</DebugSymbols>
+    <Optimize>True</Optimize>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lucene.Net, Version=1.4.3.4, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Lucene\Lucene.Net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Lucene.Net">
+      <HintPath>..\Lucene\Lucene.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="WebServer.cs" />
     <Compile Include="FileExplorer.cs" />
     <Compile Include="Indexer.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="NameObjectCollection.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="ReplaceTag.cs" />
     <Compile Include="Synchronizer.cs" />
     <Compile Include="TrayIcon.cs" />
-    <Compile Include="WebServer.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Resources.cs" />
+    <EmbeddedResource Include="OpenDesktop.resources">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Compile Include="IndexGeneration.cs" />
+    <EmbeddedResource Include="IndexGeneration.resx">
+      <DependentUpon>IndexGeneration.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="FirstTimeUser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="main.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ODIPlugin\ODIPlugin.csproj">
-      <Project>{99E38044-8BFC-4805-94F9-84C275E3120D}</Project>
-      <Name>ODIPlugin</Name>
+    <ProjectReference Include="..\IPlugin\IPlugin.csproj">
+      <Project>{3668A126-BE07-4692-82C4-B061F1212105}</Project>
+      <Name>IPlugin</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="ToDo.txt" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <PropertyGroup>
-    <PostBuildEvent>mkdir "$(TargetDir)\WebRoot"
-copy "$(SolutionDir)\WebRoot\*.*" "$(TargetDir)\WebRoot"
-mkdir "$(TargetDir)\Plugins"
-move "$(TargetDir)\YammyPlugin.dll" "$(TargetDir)\Plugins\"
-move "$(TargetDir)\YammyPlugin.pdb" "$(TargetDir)\Plugins\"</PostBuildEvent>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>

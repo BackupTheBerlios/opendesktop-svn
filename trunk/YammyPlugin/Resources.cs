@@ -15,41 +15,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
 using System;
 
-namespace OpenDesktop
+namespace YammyPlugin
 {
-    class Config
-    {
-        #region Member vars
-        private static object m_lock = new object();
-        private static Config _instance = null;
-        #endregion
-
-        #region Constructor
-        private Config()
-        {
-        }
-        #endregion
-
-        #region Standard Singleton Implementation
-        public static Config Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (m_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new Config();
-                        }
-                    }
-                }
-                return _instance;
-            }
-        }
-        #endregion
-    }
+	/// <summary>
+	/// Localizable resources for YammyPlugin
+	/// </summary>
+	public class Resources
+	{
+		public static string IndexTitle
+		{
+			get
+			{
+				return "Conversation between {0} and {1}";
+			}
+		}
+		
+		public static string ConversationStarted
+		{
+			get 
+			{
+				return "Conversation Started on {0}";
+			}
+		}
+	}
 }

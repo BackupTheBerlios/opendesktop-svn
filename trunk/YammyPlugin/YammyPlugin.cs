@@ -23,8 +23,7 @@ using System.Collections.Specialized;
 
 using Microsoft.Win32;
 
-using ODIPlugin;
-using YammyPlugin.Properties;
+using OpenDesktop.Plugin;
 
 namespace YammyPlugin
 {
@@ -120,7 +119,7 @@ namespace YammyPlugin
                     {
                         string strFilePath = Uri.UnescapeDataString(strPath);
                         Decoder d = new Decoder(strFilePath);
-                        strText = string.Format(Properties.Resources.IndexTitle, d.LocalID, d.RemoteID);
+                        strText = string.Format(Resources.IndexTitle, d.LocalID, d.RemoteID);
                     }
                 }
             }

@@ -64,7 +64,14 @@ namespace OpenDesktop
         {
             if (WebServer.Instance.IsRunning)
             {
-                System.Diagnostics.Process.Start(WebServer.Instance.LocalAddress);
+				try
+				{
+					System.Diagnostics.Process.Start(WebServer.Instance.LocalAddress);
+				}
+				catch
+				{
+					System.Diagnostics.Process.Start("iexplore.exe",WebServer.Instance.LocalAddress);
+				}
             }
         }
 
@@ -72,8 +79,15 @@ namespace OpenDesktop
         {
             if (WebServer.Instance.IsRunning)
             {
-                string strExec = string.Format("{0}Settings.html", WebServer.Instance.LocalAddress);
-                System.Diagnostics.Process.Start(strExec);
+                string strExec = string.Format("{0}config.html", WebServer.Instance.LocalAddress);
+				try
+				{
+					System.Diagnostics.Process.Start(strExec);
+				}
+				catch // This occurs if the .html association is not present
+				{
+					System.Diagnostics.Process.Start("iexplore.exe", strExec);
+				}
             }
         }
 

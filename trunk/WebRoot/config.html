@@ -1,37 +1,36 @@
 ﻿<html>
 <head>
-<title>Configure OpenDesktop Search</title>
+<title>Configure OpenDesktop</title>
 <link rel=stylesheet type="text/css" href="style.css">
 </head>
-<body>
 <div class="container">
-	<div class="header"><a href="http://opendesktop.berlios.de">Website</a></div>
+	<div class="header"><a href="http://opendesktop.berlios.de">Website</a>
+	</div>
 	<div class="content">
-	<form action="search.html" method="get" class="search">
-	<img src="logo-small.gif" align="top" />
-	<h1>Configure OpenDesktop Search</h1>
-		<table>
-		<tr>
-		<td>Index Path</td>
-		<td><input type="text" name="IndexPath" value="" size="40" /></td>
-		</tr>
-		<tr>
-		<td>Temporary Index Path</td>
-		<td><input type="text" name="TempIndexPath" value="" size="40" /></td>
-		</tr>
-		<tr>
-		<td colspan="2"><input type="checkbox" name="StartOnWindowsStartup" value="checked"/>Start OpenDesktop Search when Windows starts</td>
-		</tr>
-		<tr>
-		<td colspan="2"><input type="checkbox" name="LaunchLinksNewWindow" value="checked"/>Launch links in new window <!-- this is for things when user clicks on a search result --></td>
-		</tr>
+	<div style="text-align:center">
+		<img src="logo.gif"/>
+		<div class="settings">
+		<h1>Configure OpenDesktop</h1>
+		<$OpenDesktopSettings$>
+		<form action="config.html" method="post">
+		<table cellspacing="2" cellpadding="2" border="0">
+		<tr><td colspan="2"><b>Index Settings:</b></td></tr>
+		<tr><td>Index Path:</td><td><input type="file" name="IndexPath" value="IndexPath" /></td></tr>
+		<tr><td>Temp Path:</td><td><input type="file" name="TempPath" /></td></tr>
+		<tr><td>Update Frequency:</td><td><input type="text" name="UpdateFrequency" size="4" />hrs</td></tr>
+		<tr><td colspan="2"><b>Startup:</b></td></tr>
+		<tr><td colspan="2"><input type="checkbox" name="LaunchAtStartup" /> Launch OpenDesktop when windows starts</td></tr>
+		<tr><td colspan="2"><b>Browser Settings:</b></td></tr>
+		<tr><td colspan="2"><input type="checkbox" name="LaunchAtStartup" /> Launch links in new window</td></tr>
 		</table>
-	<input type="submit" value="Save Settings" />
-	</form>
+		<p align="center"><input type="submit" value="Save Settings" /></p>
+		</form>
+		<!-- <span class="setup-button"><a href="intro2.html">Next Step</a></span> -->
+		</div>
+	</div>
 	</div>
 	<div class="footer">
 	OpenDesktop Search &copy; 2005-2006, Pravin Paratey
 	</div>
 </div>
-</body>
 </html>

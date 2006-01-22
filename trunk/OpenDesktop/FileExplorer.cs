@@ -21,15 +21,20 @@ using System.Text;
 using System.Threading;
 using System.Collections;
 
-using ODIPlugin;
+using OpenDesktop.Plugin;
 
 namespace OpenDesktop
 {
+	#region Public Delegates
 	/// <summary>
 	/// Public delegate which tells how many documents have been indexed
 	/// </summary>
+	/// <param name="filePath">Document currently indexing</param>
 	/// <param name="numDocs">number of documents already indexed</param>
-	public delegate void IndexProgressHandler(int numDocs);
+	public delegate void IndexProgressHandler(string filePath, int numDocs);
+	public delegate void FileExplorerDoneHandler();
+	public delegate void FileExplorerProgressHandler(string filePath);
+	#endregion
 
 	class FileExplorer : IDisposable
 	{
@@ -40,16 +45,34 @@ namespace OpenDesktop
 		private Hashtable m_htDNV; // Donot visit hashmap
 		Indexer m_indexer;
 		private int m_iNumDocsDone;
-		private bool m_bAgressive; // true = dont sleep between documents
+		private bool m_bAgressive = false; // true = dont sleep between documents
 		#endregion
 
 		#region Public Events
 		public event IndexProgressHandler IndexProgress;
-		private void OnIndexProgress(int numDocs)
+		private void OnIndexProgress(string filePath, int numDocs)
 		{
 			if (IndexProgress != null)
 			{
-				IndexProgress(numDocs);
+				IndexProgress(filePath, numDocs);
+			}
+		}
+		
+		public event FileExplorerProgressHandler FileExplorerProgress;
+		private void OnFileExplorerProgress(string filePath)
+		{
+			if (FileExplorerProgress != null)
+			{
+				FileExplorerProgress(filePath);
+			}
+		}
+		
+		public event FileExplorerDoneHandler FileExplorerDone;
+		private void OnFileExplorerDone()
+		{
+			if(FileExplorerDone != null)
+			{
+				FileExplorerDone();
 			}
 		}
 		#endregion
@@ -60,7 +83,7 @@ namespace OpenDesktop
 			m_fileFunctionMap = fileFunctionMap;
 			_quit = false;
 			//TODO: m_htDNV = 
-			m_indexer = new Indexer(Properties.Settings.Default.NewIndexPath, IndexMode.CREATE);
+			m_indexer = new Indexer(Properties.Settings.Instance.TempIndexPath, IndexMode.CREATE);
 		}
 
 		public void Dispose()
@@ -77,20 +100,36 @@ namespace OpenDesktop
 		#endregion
 
 		#region Run/Stop/Pause/Resume
-		public void Run()
+		/// <summary>
+		/// Starts the FileExploring process
+		/// </summary>
+		/// <param name="aggresive">
+		/// If true, thread priority isnt set to low and there is no delay after
+		/// each file addition
+		/// </param>
+		public void Run(bool aggressive)
 		{
 			m_iNumDocsDone = 0;
+			
+			m_bAgressive = aggressive;
 
 			// Check if an update of the index is due
-			TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Default.IndexUpdateFrequency, 0, 0);
-			if (DateTime.Now.Subtract(Properties.Settings.Default.IndexLastUpdated) < objUpdateFrequency)
+			TimeSpan objUpdateFrequency = new TimeSpan(Properties.Settings.Instance.IndexUpdateFrequency, 0, 0);
+			if (DateTime.Now.Subtract(Properties.Settings.Instance.IndexLastUpdated) < objUpdateFrequency)
 			{
 				Logger.Instance.LogDebug("Update time not elapsed. Exiting FileExplorer");
 				return;
 			}
 
 			m_objThread = new Thread(new ThreadStart(Explore));
-			m_objThread.Priority = ThreadPriority.Lowest;
+			if(m_bAgressive)
+			{
+				m_objThread.Priority = ThreadPriority.Normal;
+			}
+			else
+			{
+				m_objThread.Priority = ThreadPriority.Lowest;
+			}
 			m_objThread.Name = "FileExplorer";
 			try
 			{
@@ -137,14 +176,15 @@ namespace OpenDesktop
 				{
 					Logger.Instance.LogDebug("Exploring " + strDrive);
 					Explore(strDrive);
+					break; //FIXME: REMOVE THIS. IT IS TEMP FOR DEBUGGING ONLY
 				}
 			}
 
 			if (!_quit) // If the exit was natural
 			{
 				Logger.Instance.LogDebug("Moving index from " +
-					Properties.Settings.Default.IndexPath + " to " +
-					Properties.Settings.Default.NewIndexPath);
+					Properties.Settings.Instance.IndexPath + " to " +
+					Properties.Settings.Instance.TempIndexPath);
 				// Close index and move it 
 				m_indexer.Close(); m_indexer = null;
 
@@ -153,25 +193,31 @@ namespace OpenDesktop
 				Synchronizer.Instance.LockIndex(this);
 				try
 				{
-					Directory.Delete(Properties.Settings.Default.IndexPath, true);
-					Directory.Move(Properties.Settings.Default.NewIndexPath,
-						Properties.Settings.Default.IndexPath);
-					Synchronizer.Instance.ReleaseIndex(this);
+					if (Directory.Exists(Properties.Settings.Instance.IndexPath))
+					{
+						Directory.Delete(Properties.Settings.Instance.IndexPath, true);
+					}
+					Directory.Move(Properties.Settings.Instance.TempIndexPath,
+						Properties.Settings.Instance.IndexPath);
 
-					Properties.Settings.Default.IndexLastUpdated = DateTime.Now;
-					Properties.Settings.Default.Save();
+					Properties.Settings.Instance.IndexLastUpdated = DateTime.Now;
+					Properties.Settings.Instance.Save();
 				}
 				catch (Exception e)
 				{
 					Logger.Instance.LogException(e);
 				}
+				Synchronizer.Instance.ReleaseIndex(this);
 			}
+			OnFileExplorerDone(); // Signal we are done
 		}
 
 		private void Explore(string directory)
 		{
 			if (_quit)
 				return;
+			
+			OnFileExplorerProgress(directory);
 
 			string[] strDirList;
 			string[] strFileList;
@@ -206,7 +252,7 @@ namespace OpenDesktop
 						if (sInfo != null)
 						{
 							m_indexer.AddDocument(sInfo);
-							OnIndexProgress(++m_iNumDocsDone);
+							OnIndexProgress(strFile, ++m_iNumDocsDone);
 						}
 					}
 					catch (Exception e)
@@ -214,6 +260,9 @@ namespace OpenDesktop
 						Logger.Instance.LogException(e);
 					}
 				}
+				
+				if(m_bAgressive)
+					Thread.Sleep(100);
 			}
 			foreach (string strDir in strDirList)
 			{

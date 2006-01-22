@@ -23,37 +23,58 @@ namespace OpenDesktop
 {
     static class Program
     {
+    	static object m_firstTimeUserLock = new object();
+    	
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
         static void Main()
         {
+			if (AppIsRunning())
+			{
+				return;
+			}
             Logger LOG = Logger.Instance;
             LOG.LogDebug("Starting OpenDesktop");
-            if (AppIsRunning())
-            {
-                return;
-            }
+            
+            FirstTimeUser firstTimeUser = new FirstTimeUser();
+            bool alreadydone = firstTimeUser.IsFirstTimeUser();
+            //firstTimeUser = null;
+            
             LOG.LogDebug("Bringing up Webserver");
             WebServer.Instance.Start();
             LOG.LogDebug("Displaying NotifyIcon");
             TrayIcon trayIcon = new TrayIcon();
             MessageBox.Show(WebServer.Instance.LocalAddress);
-            FileExplorer fileExplorer = new FileExplorer(PluginManager.Instance.RegisteredFileExtensions);
-            //fileExplorer.IndexProgress += new IndexProgressHandler(fileExplorer_IndexProgress);
-            fileExplorer.Run();
+
+            FileExplorer fileExplorer = null;
+            IndexProgressHandler dlgtIndexProgressHandler = null;
+            if(!alreadydone)
+            {
+	            fileExplorer = new FileExplorer(PluginManager.Instance.RegisteredFileExtensions);
+	            dlgtIndexProgressHandler = new IndexProgressHandler(fileExplorer_IndexProgress);
+	            fileExplorer.IndexProgress += dlgtIndexProgressHandler;
+	            fileExplorer.Run(false); // Dont be aggressive
+            }
             
             Application.Run();
 
-            fileExplorer.Stop();
+            if(!alreadydone)
+            {
+            	fileExplorer.IndexProgress -= dlgtIndexProgressHandler;
+            	fileExplorer.Stop();
+            }
             WebServer.Instance.Stop();
             LOG.LogDebug("Exiting OpenDesktop");
             Logger.Instance.Dispose();
         }
-
-        // Changes the TrayIcon message to reflect number of documents indexed
-        static void fileExplorer_IndexProgress(int numDocs)
+        
+        /// <summary>
+        /// Changes the TrayIcon message to reflect number of documents indexed
+        /// </summary>
+        /// <param name="numDocs"></param>
+        static void fileExplorer_IndexProgress(string filePath, int numDocs)
         {
             
         }

@@ -20,8 +20,6 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using YammyPlugin.Properties;
-
 namespace YammyPlugin
 {
     /// <summary>

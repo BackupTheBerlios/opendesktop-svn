@@ -1,6 +1,4 @@
 - Weird Lucene results for words "a b" and "b a" interchanged. 
   For one, number of results differ!
-- favicon.ico must go as image/ico DONE
-- config must ask user where the index directory will be
-- Monitor locks used in Synchronizer. Are they okay?
 - Implement DNV
+- Add x documents indexed

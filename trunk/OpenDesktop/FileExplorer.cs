@@ -140,7 +140,7 @@ namespace OpenDesktop
 				Logger.Instance.LogException(e);
 			}
 		}
-
+/*
 		public void Pause()
 		{
 			if (m_objThread != null && m_objThread.ThreadState == ThreadState.Running)
@@ -156,16 +156,14 @@ namespace OpenDesktop
 				m_objThread.Resume();
 			}
 		}
-
+*/
 		public void Stop()
 		{
 			_quit = true;
 		}
 		#endregion
 
-		/// <summary>
-		/// Explores
-		/// </summary>
+		#region Explore
 		private void Explore()
 		{
 			string [] strDriveList = Environment.GetLogicalDrives();
@@ -189,7 +187,6 @@ namespace OpenDesktop
 				m_indexer.Close(); m_indexer = null;
 
 				// Lock the index as we are going to be moving it
-				// FIXME: RACE CONDITION!!!! The code below is useless
 				Synchronizer.Instance.LockIndex(this);
 				try
 				{
@@ -261,7 +258,7 @@ namespace OpenDesktop
 					}
 				}
 				
-				if(m_bAgressive)
+				if(!m_bAgressive)
 					Thread.Sleep(100);
 			}
 			foreach (string strDir in strDirList)
@@ -278,5 +275,6 @@ namespace OpenDesktop
 				}
 			}
 		}
+		#endregion
 	}
 }

@@ -57,7 +57,9 @@
     <EmbeddedResource Include="OpenDesktop.resources">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Compile Include="IndexGeneration.cs" />
+    <Compile Include="IndexGeneration.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="IndexGeneration.resx">
       <DependentUpon>IndexGeneration.cs</DependentUpon>
     </EmbeddedResource>

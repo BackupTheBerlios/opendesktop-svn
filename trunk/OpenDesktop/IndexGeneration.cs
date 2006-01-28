@@ -88,7 +88,7 @@ namespace OpenDesktop
 			this.lblFilePath.Text = currentFile;
 		}
 		
-		public void Dispose()
+		public new void Dispose()
 		{
 			this.Hide();
 			this.Close();

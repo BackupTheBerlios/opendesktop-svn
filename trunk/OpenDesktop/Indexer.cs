@@ -128,9 +128,13 @@ namespace OpenDesktop
 			bool retVal = false;
 			if (m_bSucess && (m_indexMode == IndexMode.CREATE || m_indexMode == IndexMode.APPEND))
 			{
+				// README: This is so that < and > don't interfere with existing
+				// tags in the browser
+				string strText = info.Text.Replace("<", "&lt;").Replace(">", "&gt;");
+				
 				Document doc = new Document();
 				doc.Add(Field.UnIndexed("title", info.Title));
-				doc.Add(Field.Text("content", info.Text));
+				doc.Add(Field.Text("content", strText));
 				doc.Add(Field.UnIndexed("launcher", info.Launcher));
 				m_indexWriter.AddDocument(doc);
 				retVal = true;

@@ -161,15 +161,15 @@ namespace OpenDesktop
                     string.Format(Properties.Resources.SearchResultsHeader,
                     (iStartAt + 1).ToString(), iEndAt.ToString(),
                     sinfo.Length.ToString(), strSearchTerm) + "</div>");
-                sb.Append("<ol class=\"search-results\">");
+                sb.Append("<div class=\"search-results\"><ol>");
 
                 for (int i = iStartAt; i < iEndAt; i++)
                 {
                     string strDisplayText = GetExcerpt(sinfo[i].Text, strSearchTerm);
                     sb.Append("<li value=\"" + (i+1).ToString() + "\"><a href=\"" + sinfo[i].Launcher + 
-                        "\">" + sinfo[i].Title + "</a><br />" + strDisplayText + "</li>");
+                        "\"><span style=\"font-size:12pt\">" + sinfo[i].Title + "</span></a><br />" + strDisplayText + "</li>");
                 }
-                sb.Append("</ol>");
+                sb.Append("</ol></div>");
                 int iCurPageNum = (iStartAt/10);
                 string strPrevUrl = string.Empty;
                 string strNextUrl = string.Empty;

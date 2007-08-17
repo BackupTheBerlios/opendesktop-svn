@@ -20,8 +20,10 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Collections;
+using System.Collections.Specialized;
 
 using OpenDesktop.Plugin;
+using OpenDesktop.Properties;
 
 namespace OpenDesktop
 {
@@ -42,7 +44,7 @@ namespace OpenDesktop
 		private NameObjectCollection m_fileFunctionMap;
 		private Thread m_objThread;
 		private bool _quit;
-		private Hashtable m_htDNV; // Donot visit hashmap
+		private ListDictionary m_DNV; // Donot visit hashmap
 		Indexer m_indexer;
 		private int m_iNumDocsDone;
 		private bool m_bAgressive = false; // true = dont sleep between documents
@@ -82,7 +84,7 @@ namespace OpenDesktop
 		{
 			m_fileFunctionMap = fileFunctionMap;
 			_quit = false;
-			//TODO: m_htDNV = 
+			m_DNV = Settings.Instance.DNV;
 			m_indexer = new Indexer(Properties.Settings.Instance.TempIndexPath, IndexMode.CREATE);
 		}
 
@@ -267,7 +269,9 @@ namespace OpenDesktop
 					return;
 				try
 				{
-					Explore(strDir);
+					//FIXME: Make this case-insensitive
+					if(!m_DNV.Contains(directory))
+						Explore(strDir);
 				}
 				catch (Exception e) // Out of stack exception?
 				{

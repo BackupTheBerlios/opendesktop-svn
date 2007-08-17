@@ -24,10 +24,12 @@ namespace OpenDesktop.Properties
 		private static Settings _instance = null;
 		
 		private string m_strAppData;
+		private string m_strConfigFilePath;
 		private string m_strIndexPath;
 		private string m_strTempIndexPath;
 		private DateTime m_dtIndexLastUpdated;
 		private int m_indexUpdateFreq;
+		private ListDictionary m_dnv;
 		#endregion
 		
 		/// <summary>
@@ -37,6 +39,9 @@ namespace OpenDesktop.Properties
 		{
 			// TODO: If Settings is empty, fill it up with default values and save
 			m_strAppData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OpenDesktop");
+			m_strConfigFilePath = Path.Combine(m_strAppData, "config.ini");
+			
+			m_dnv = new ListDictionary();
 			
 			ReadConfig();
 		}
@@ -62,15 +67,12 @@ namespace OpenDesktop.Properties
 		}
 		#endregion
 		
+		#region Getters/Setters
 		public string IndexPath
 		{
 			get
 			{
 				return m_strIndexPath;
-			}
-			set
-			{
-				;
 			}
 		}
 		
@@ -79,10 +81,6 @@ namespace OpenDesktop.Properties
 			get
 			{
 				return m_strTempIndexPath;
-			}
-			set
-			{
-				;
 			}
 		}
 		
@@ -106,6 +104,18 @@ namespace OpenDesktop.Properties
 			}
 		}
 		
+		/// <summary>
+		/// Returns a list of folders to NOT explore
+		/// </summary>
+		public ListDictionary DNV
+		{
+			get
+			{
+				return m_dnv;
+			}
+		}
+		#endregion
+		
 		private void ReadConfig()
 		{
 			// Set Default values
@@ -113,11 +123,27 @@ namespace OpenDesktop.Properties
 			m_strTempIndexPath = Path.Combine(m_strAppData, "TempIndex");
 			m_dtIndexLastUpdated = DateTime.MinValue;
 			m_indexUpdateFreq = 24;
+			// Add a few values to dnv
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.System), null);
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), null);
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), null);
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.History), null);
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), null);
+			m_dnv.Add(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), null);
 			
-			string strConfigFilePath = Path.Combine(m_strAppData, "config.ini");
-			if(!File.Exists(strConfigFilePath))
+			if(!File.Exists(m_strConfigFilePath))
 				return;
-			StreamReader reader = new StreamReader(strConfigFilePath);
+			
+			StreamReader reader = null;
+			
+			try
+			{
+				reader = new StreamReader(m_strConfigFilePath);
+			}
+			catch (IOException)
+			{
+				return;
+			}
 			while(true)
 			{
 				string strLine = reader.ReadLine();
@@ -149,6 +175,11 @@ namespace OpenDesktop.Properties
 					case "IndexUpdateFreq":
 						m_indexUpdateFreq = Int32.Parse(strNameValue[1].Trim());
 						break;
+					case "ExcludeFolder":
+						string strFolder = strNameValue[1].Trim();
+						if(!m_dnv.Contains(strFolder))
+							m_dnv.Add(strFolder, null);
+						break;
 				}
 				
 			}
@@ -160,7 +191,28 @@ namespace OpenDesktop.Properties
 		/// </summary>
 		public void Save()
 		{
+			StreamWriter writer = null;
+			try
+			{
+				writer = new StreamWriter(m_strConfigFilePath, false, System.Text.Encoding.UTF8);
+			}
+			catch(IOException e)
+			{
+				Logger.Instance.LogException(e);
+				return;
+			}
 			
+			writer.WriteLine("IndexPath" + "=" + m_strIndexPath);
+			writer.WriteLine("TempIndexPath" + "=" + m_strTempIndexPath);
+			writer.WriteLine("IndexLastUpdated" + "=" + m_dtIndexLastUpdated.ToString());
+			writer.WriteLine("IndexUpdateFreq" + "=" + m_indexUpdateFreq.ToString());
+			
+			foreach (string folder in m_dnv.Keys)
+			{
+				writer.WriteLine("ExcludeFolder" + "=" + folder);
+			}
+			
+			writer.Close();
 		}
 		
 		public string ProcessTag(NameValueCollection queryString)
@@ -174,14 +226,14 @@ namespace OpenDesktop.Properties
 					// First time user
 
 				}
-				Settings.Instance.IndexPath = queryString["IndexPath"];
-				Settings.Instance.TempIndexPath = queryString["TempIndexPath"];
+//				Settings.Instance.IndexPath = queryString["IndexPath"];
+//				Settings.Instance.TempIndexPath = queryString["TempIndexPath"];
 			}
 			sbResult.Append(@"<form action=""config.html"" method=""post"">");
 			sbResult.Append(@"<table cellspacing=""2"" cellpadding=""2"" border=""0"">");
-			sbResult.Append(@"<tr><td colspan=""2""><b>Index Settings:</b></td></tr>");
-			sbResult.Append(@"<tr><td>Index Path:</td><td><input type=""file"" name=""IndexPath"" value=""" + Settings.Instance.IndexPath + @""" /></td></tr>");
-			sbResult.Append(@"<tr><td>Temp Path:</td><td><input type=""file"" name=""TempIndexPath"" value=""" + Settings.Instance.TempIndexPath + @""" /></td></tr>");
+//			sbResult.Append(@"<tr><td colspan=""2""><b>Index Settings:</b></td></tr>");
+//			sbResult.Append(@"<tr><td>Index Path:</td><td><input type=""file"" name=""IndexPath"" value=""" + Settings.Instance.IndexPath + @""" /></td></tr>");
+//			sbResult.Append(@"<tr><td>Temp Path:</td><td><input type=""file"" name=""TempIndexPath"" value=""" + Settings.Instance.TempIndexPath + @""" /></td></tr>");
 			sbResult.Append(@"<tr><td>Update Frequency:</td><td><input type=""text"" name=""UpdateFrequency"" size=""4"" value=""" + Settings.Instance.IndexUpdateFrequency + @"""/>hrs</td></tr>");
 			sbResult.Append(@"<tr><td colspan=""2""><b>Startup:</b></td></tr>");
 			sbResult.Append(@"<tr><td colspan=""2""><input type=""checkbox"" name=""LaunchAtStartup"" /> Launch OpenDesktop when windows starts</td></tr>");

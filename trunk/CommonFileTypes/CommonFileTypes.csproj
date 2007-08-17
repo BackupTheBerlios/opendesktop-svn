@@ -30,6 +30,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="TextIndexer.cs" />
+    <Compile Include="HTMLIndexer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IPlugin\IPlugin.csproj">
